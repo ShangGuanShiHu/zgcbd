@@ -25,7 +25,7 @@ public class Pack implements Serializable {
     private Timestamp timestamp;
     
     private Long seq;
-    
+
     private Long ack;
     
     private String ipv4Src;
