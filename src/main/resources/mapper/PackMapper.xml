@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.zgcbd.mapper.PackMapper">
+    <cache />
+    <insert id="insertPack">
+        insert into pack values (#{dpid}, #{timestamp}, #{seq}, #{ack}, #{ipv4Src}, #{ipv4Dst}, #{ethSrc}, #{ethDst}, #{ethertype})
+    </insert>
+    <select id="selectByDpid" resultType="com.example.zgcbd.pojo.Pack">
+        select * from pack where dpid = #{dpid}
+    </select>
+    <select id="selectALL" resultType="com.example.zgcbd.pojo.Pack">
+        select * from pack
+    </select>
+    <select id="selectInRoute" resultType="com.example.zgcbd.pojo.Pack">
+        select * from pack where seq = #{seq}
+    </select>
+    <select id="selectPackages" resultType="com.example.zgcbd.pojo.Pack">
+        select * from pack where 0=0
+        <if test="dpid != null">
+            and dpid = #{dpid}
+        </if>
+        <if test="ipv4Src != null">
+            and ipv4_src = #{ipv4Src}
+        </if>
+        <if test="ethSrc != null">
+            and eth_src = #{ethSrc}
+        </if>
+        <if test="ethDst != null">
+            and eth_dst = #{ethDst}
+        </if>
+        <if test="ipv4Dst != null">
+            and ipv4_dst = #{ipv4Dst}
+        </if>
+        <if test="ethertype != null">
+            and ethertype = #{ethertype}
+        </if>
+        <if test="startTimestamp != null">
+            and timestamp &gt;=#{startTimestamp}
+        </if>
+        <if test="endTimestamp != null">
+            and timestamp &lt;=#{endTimestamp}
+        </if>
+    </select>
+</mapper>

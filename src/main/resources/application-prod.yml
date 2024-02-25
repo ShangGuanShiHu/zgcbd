@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://mysql:3306/zgcbd
+    username: root
+    password: 123456
+
+packFile:
+  dir: /home/dell/zgcbd/app/files
+  names: log.txt
