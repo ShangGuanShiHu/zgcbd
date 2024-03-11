@@ -8,6 +8,7 @@ import com.example.zgcbd.service.INTPackService;
 import com.example.zgcbd.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -74,4 +75,13 @@ public class INTPackServiceImpl implements INTPackService {
     public List<Long> selectPackageRoute(String traceId){
         return intpackMapper.selectByTraceId(traceId).stream().map(INTPack::getDpid).collect(Collectors.toList());
     }
+
+    public List<Map> getALLAriPackages(String dpid){
+        return intpackMapper.selectALLAriPackages(dpid);
+    }
+
+    public INTPack getINTPack(String traceId, String dpid){
+        return intpackMapper.getINTPack(traceId, dpid);
+    }
+
 }

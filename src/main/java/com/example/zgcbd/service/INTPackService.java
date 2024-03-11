@@ -2,6 +2,7 @@ package com.example.zgcbd.service;
 
 import com.example.zgcbd.pojo.INTPack;
 import com.example.zgcbd.pojo.Pack;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Map;
@@ -16,4 +17,8 @@ public interface INTPackService {
     List<List<Long>> selectStationTopo();
 
     List<Long> selectPackageRoute(String traceId);
+
+    List<Map> getALLAriPackages(String dpid);
+
+    INTPack getINTPack(String traceId, String dpid);
 }

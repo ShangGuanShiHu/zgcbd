@@ -19,5 +19,7 @@ public class Station implements Serializable {
     private Double latitude;
     
     private String label;
+
+    private Long startTime;
 }
 

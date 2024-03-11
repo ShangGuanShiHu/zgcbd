@@ -4,12 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.apache.logging.log4j.util.PropertySource;
+
+import java.util.Comparator;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class INTPack {
+public class INTPack implements Comparator<INTPack> {
   private String content;
   private String copyFlag;
   private String optclass;
@@ -23,4 +26,10 @@ public class INTPack {
   private String dataDst;
   private long timebias;
   private String undefined;
+
+
+  @Override
+  public int compare(INTPack o1, INTPack o2) {
+      return o1.getTraceId().compareTo(o2.getTraceId());
+  }
 }

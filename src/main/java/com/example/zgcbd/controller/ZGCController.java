@@ -51,6 +51,12 @@ public class ZGCController {
 //        return appsPageInfo;
 //    }
 
+    @GetMapping("/package/getOriPackages")
+    public List<Map> getOriPackagesByStationId(String dpid){
+
+        return packService.getALLAriPackages(dpid);
+    }
+
 
     @GetMapping("/station/getStationTopo")
     public List<List<Long>> getStationTopo() {
@@ -60,6 +66,12 @@ public class ZGCController {
     @GetMapping("/package/getPackageRoute")
     public List<Long> getPackageRoute(@RequestParam("traceId") String traceId){
         return packService.selectPackageRoute(traceId);
+    }
+
+
+    @GetMapping("/package/getINTPack")
+    public INTPack getINTPack(@RequestParam String traceId, @RequestParam String dpid){
+        return packService.getINTPack(traceId, dpid);
     }
 
 }

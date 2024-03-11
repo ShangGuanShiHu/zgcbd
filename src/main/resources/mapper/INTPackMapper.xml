@@ -12,4 +12,14 @@
         select * from intpack where trace_id = #{traceId}
         order by timebias
     </select>
+    <select id="selectALLAriPackages" resultType="java.util.Map">
+        select distinct trace_id, data_type, data_size, data_src, data_dst from intpack
+        where 0=0
+        <if test="dpid != null">
+            and dpid = #{dpid}
+        </if>
+    </select>
+    <select id="getINTPack" resultType="com.example.zgcbd.pojo.INTPack">
+        select * from intpack where trace_id = #{traceId} and dpid = #{dpid}
+    </select>
 </mapper>
