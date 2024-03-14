@@ -5,4 +5,7 @@
     <select id="selectALL" resultType="com.example.zgcbd.pojo.Station">
         select * from station
     </select>
+    <select id="getStation" resultType="com.example.zgcbd.pojo.Station">
+        select * from station where dpid=#{dpid}
+    </select>
 </mapper>

@@ -12,12 +12,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @MapperScan(value = "com.example.zgcbd.mapper")
 public class ZGCController {
+    private Map<Long, Long> station_start_time = new HashMap<>();;
+
     @Autowired
     private StationService stationService;
 
@@ -26,14 +30,20 @@ public class ZGCController {
 
     @GetMapping("/station/getALLStations")
     public List<Station> getALLStations(){
-        return stationService.selectALLStations();
+        List<Station> stations = stationService.selectALLStations();
+        if(station_start_time.size() == 0){
+            for(Station station:stations){
+                station_start_time.put(station.getDpid(), station.getStartTime());
+            }
+        }
+        return stations;
     }
 
     @GetMapping("/package/getPackagesByStationId")
-    public List<INTPack> getPackagesByStationId(@RequestParam Map<String, String> params){
+    public List<INTPack> getPackagesByStationId(Long dpid){
         List<INTPack> result;
-        if(params.containsKey("dpid"))
-            result = packService.selectPackagesByDpid(Long.valueOf(params.get("dpid")));
+        if(!Objects.isNull(dpid))
+            result = packService.selectPackagesByDpid(dpid);
         else {
             result = packService.selectAllPackages();
         }
@@ -52,9 +62,12 @@ public class ZGCController {
 //    }
 
     @GetMapping("/package/getOriPackages")
-    public List<Map> getOriPackagesByStationId(String dpid){
+    public PageInfo<Map> getOriPackagesByStationId(@RequestParam int currentPage, @RequestParam int pageSize, Long dpid, Long dataType, String traceId, String dataSrc, String dataDst, Long dataSize){
 
-        return packService.getALLAriPackages(dpid);
+        PageHelper.startPage(currentPage,pageSize);
+        List<Map> result = packService.getAriPackages(dpid, dataType, traceId, dataSrc, dataDst, dataSize);
+        PageInfo<Map> appsPageInfo = new PageInfo<>(result);
+        return appsPageInfo;
     }
 
 
@@ -70,8 +83,14 @@ public class ZGCController {
 
 
     @GetMapping("/package/getINTPack")
-    public INTPack getINTPack(@RequestParam String traceId, @RequestParam String dpid){
-        return packService.getINTPack(traceId, dpid);
+    public INTPack getINTPack(@RequestParam String traceId, @RequestParam long dpid){
+        INTPack intPack = packService.getINTPack(traceId, dpid);
+
+        if(!station_start_time.containsKey(intPack.getDpid())) {
+            station_start_time.put(intPack.getDpid(), stationService.getStationById(intPack.getDpid()).getStartTime());
+        }
+        intPack.setTimebias(station_start_time.get(intPack.getDpid()) + intPack.getTimebias());
+        return intPack;
     }
 
 }

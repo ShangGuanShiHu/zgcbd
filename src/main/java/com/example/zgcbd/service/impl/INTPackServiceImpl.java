@@ -76,11 +76,11 @@ public class INTPackServiceImpl implements INTPackService {
         return intpackMapper.selectByTraceId(traceId).stream().map(INTPack::getDpid).collect(Collectors.toList());
     }
 
-    public List<Map> getALLAriPackages(String dpid){
-        return intpackMapper.selectALLAriPackages(dpid);
+    public List<Map> getAriPackages(Long dpid, Long dataType, String traceId, String dataSrc, String dataDst, Long dataSize){
+        return intpackMapper.selectALLAriPackages(dpid, dataType, traceId, dataSrc, dataDst, dataSize);
     }
 
-    public INTPack getINTPack(String traceId, String dpid){
+    public INTPack getINTPack(String traceId, Long dpid){
         return intpackMapper.getINTPack(traceId, dpid);
     }
 

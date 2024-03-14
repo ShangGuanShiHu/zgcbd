@@ -18,7 +18,7 @@ public interface INTPackService {
 
     List<Long> selectPackageRoute(String traceId);
 
-    List<Map> getALLAriPackages(String dpid);
+    List<Map> getAriPackages(Long dpid, Long dataType, String traceId, String dataSrc, String dataDst, Long dataSize);
 
-    INTPack getINTPack(String traceId, String dpid);
+    INTPack getINTPack(String traceId, Long dpid);
 }

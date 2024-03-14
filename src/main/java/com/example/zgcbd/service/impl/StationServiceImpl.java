@@ -17,4 +17,8 @@ public class StationServiceImpl implements StationService {
         List<Station> stations = stationMapper.selectALL();
         return stations;
     }
+
+    public Station getStationById(long dpid){
+        return stationMapper.getStation(dpid);
+    }
 }

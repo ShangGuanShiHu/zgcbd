@@ -16,7 +16,7 @@ public interface INTPackMapper{
 
     List<INTPack> selectByTraceId(String traceId);
 
-    List<Map> selectALLAriPackages(String dpid);
+    List<Map> selectALLAriPackages(Long dpid, Long dataType, String traceId, String dataSrc, String dataDst, Long dataSize);
 
-    INTPack getINTPack(String traceId, String dpid);
+    INTPack getINTPack(String traceId, Long dpid);
 }

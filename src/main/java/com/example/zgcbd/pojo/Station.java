@@ -12,7 +12,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @ToString
 public class Station implements Serializable {
-    private Integer dpid;
+    private Long dpid;
     
     private Double longitude;
     

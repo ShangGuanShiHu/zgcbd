@@ -18,6 +18,18 @@
         <if test="dpid != null">
             and dpid = #{dpid}
         </if>
+        <if test="dataType != null">
+            and data_type = #{dataType}
+        </if>
+        <if test="dataSize != null">
+            and data_size = #{dataSize}
+        </if>
+        <if test="dataSrc != null">
+            and data_src = #{dataSrc}
+        </if>
+        <if test="dataDst != null">
+            and data_dst = #{dataDst}
+        </if>
     </select>
     <select id="getINTPack" resultType="com.example.zgcbd.pojo.INTPack">
         select * from intpack where trace_id = #{traceId} and dpid = #{dpid}

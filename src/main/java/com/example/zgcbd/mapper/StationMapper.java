@@ -9,4 +9,6 @@ import java.util.List;
 @Mapper
 public interface StationMapper{
     List<Station> selectALL();
+
+    Station getStation(long dpid);
 }

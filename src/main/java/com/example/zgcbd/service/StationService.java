@@ -8,4 +8,6 @@ import java.util.List;
 public interface StationService {
     // 获取所有的站点
     List<Station> selectALLStations();
+
+    Station getStationById(long dpid);
 }
