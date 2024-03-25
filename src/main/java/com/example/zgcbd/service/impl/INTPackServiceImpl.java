@@ -1,16 +1,15 @@
 package com.example.zgcbd.service.impl;
 
 import com.example.zgcbd.mapper.INTPackMapper;
-import com.example.zgcbd.mapper.PackMapper;
 import com.example.zgcbd.pojo.INTPack;
-import com.example.zgcbd.pojo.Pack;
+import com.example.zgcbd.pojo.OriPack;
 import com.example.zgcbd.service.INTPackService;
-import com.example.zgcbd.util.Utils;
+import com.example.zgcbd.service.StationService;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -18,6 +17,46 @@ import java.util.stream.Collectors;
 public class INTPackServiceImpl implements INTPackService {
     @Autowired
     private INTPackMapper intpackMapper;
+
+    @Autowired
+    private StationService stationService;
+
+    @Data
+    @AllArgsConstructor
+    public class Context implements Comparable<Context>{
+        private Long time;
+        private Long dpid;
+
+        @Override
+        public int compareTo(Context o) {
+            return time.compareTo(o.getTime());
+        }
+    }
+
+    @Data
+    public class OriPackDecorator{
+        private OriPack oriPack;
+
+        private List<Context> contexts;
+
+        public OriPack updateOriPack(){
+            Collections.sort(contexts);
+            oriPack.setRoute(contexts.stream().map(Context::getDpid).toList());
+            long transTime= contexts.get(contexts.size() - 1).getTime() - contexts.get(0).getTime();
+            oriPack.setTransTime(transTime);
+            return oriPack;
+        }
+
+        public void addContext(Long time, Long dpid){
+            contexts.add(new Context(time, dpid));
+        }
+
+        public OriPackDecorator(OriPack oriPack){
+            this.oriPack = oriPack;
+            this.contexts = new ArrayList<>();
+        }
+    }
+
 
     public List<INTPack> selectPackagesByDpid(long dpid){
         return intpackMapper.selectByDpid(dpid);
@@ -73,11 +112,37 @@ public class INTPackServiceImpl implements INTPackService {
     }
 
     public List<Long> selectPackageRoute(String traceId){
-        return intpackMapper.selectByTraceId(traceId).stream().map(INTPack::getDpid).collect(Collectors.toList());
+        List<INTPack> packs = intpackMapper.selectByTraceId(traceId);
+        packs.forEach((pack)->{pack.setTimebias(pack.getTimebias()+stationService.getStartTime(pack.getDpid()));});
+        Collections.sort(packs);
+        return packs.stream().map(INTPack::getDpid).toList();
     }
 
-    public List<Map> getAriPackages(Long dpid, Long dataType, String traceId, String dataSrc, String dataDst, Long dataSize){
-        return intpackMapper.selectALLAriPackages(dpid, dataType, traceId, dataSrc, dataDst, dataSize);
+    public List<OriPack> getAriPackages(Long dpid, Long dataType, String traceId, String dataSrc, String dataDst, Long dataSize){
+        List<OriPack> result = intpackMapper.selectALLAriPackages(dpid, dataType, traceId, dataSrc, dataDst, dataSize);
+
+        Map<String, OriPackDecorator> map = new HashMap<>();
+
+        for(OriPack oriPack: result){
+            map.put(oriPack.getTraceId(), new OriPackDecorator(oriPack));
+        }
+
+        List<INTPack> packs = intpackMapper.selectALLPackages(null, dataType, traceId, dataSrc, dataDst, dataSize);
+
+        OriPackDecorator oriPackDecorator;
+        for(INTPack pack:packs){
+            if(!map.containsKey(pack.getTraceId())){
+                continue;
+            }
+            oriPackDecorator = map.get(pack.getTraceId());
+            oriPackDecorator.addContext(stationService.getStartTime(pack.getDpid())+pack.getTimebias(), pack.getDpid());
+        }
+
+        for(OriPackDecorator oriPackDecorator1:map.values()){
+            oriPackDecorator1.updateOriPack();
+        }
+
+        return result;
     }
 
     public INTPack getINTPack(String traceId, Long dpid){

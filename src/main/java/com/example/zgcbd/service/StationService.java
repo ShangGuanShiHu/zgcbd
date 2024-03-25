@@ -10,4 +10,6 @@ public interface StationService {
     List<Station> selectALLStations();
 
     Station getStationById(long dpid);
+
+    Long getStartTime(long dpid);
 }

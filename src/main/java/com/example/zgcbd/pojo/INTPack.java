@@ -12,7 +12,7 @@ import java.util.Comparator;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class INTPack implements Comparator<INTPack> {
+public class INTPack implements Comparable<INTPack>{
   private String content;
   private String copyFlag;
   private String optclass;
@@ -29,7 +29,7 @@ public class INTPack implements Comparator<INTPack> {
 
 
   @Override
-  public int compare(INTPack o1, INTPack o2) {
-      return o1.getTraceId().compareTo(o2.getTraceId());
+  public int compareTo(INTPack o) {
+    return String.valueOf(this.getTimebias()).compareTo(String.valueOf(o.getTimebias()));
   }
 }

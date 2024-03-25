@@ -1,6 +1,7 @@
 package com.example.zgcbd.controller;
 
 import com.example.zgcbd.pojo.INTPack;
+import com.example.zgcbd.pojo.OriPack;
 import com.example.zgcbd.pojo.Station;
 import com.example.zgcbd.service.INTPackService;
 import com.example.zgcbd.service.StationService;
@@ -20,7 +21,7 @@ import java.util.Objects;
 @RestController
 @MapperScan(value = "com.example.zgcbd.mapper")
 public class ZGCController {
-    private Map<Long, Long> station_start_time = new HashMap<>();;
+
 
     @Autowired
     private StationService stationService;
@@ -30,13 +31,7 @@ public class ZGCController {
 
     @GetMapping("/station/getALLStations")
     public List<Station> getALLStations(){
-        List<Station> stations = stationService.selectALLStations();
-        if(station_start_time.size() == 0){
-            for(Station station:stations){
-                station_start_time.put(station.getDpid(), station.getStartTime());
-            }
-        }
-        return stations;
+        return stationService.selectALLStations();
     }
 
     @GetMapping("/package/getPackagesByStationId")
@@ -62,11 +57,11 @@ public class ZGCController {
 //    }
 
     @GetMapping("/package/getOriPackages")
-    public PageInfo<Map> getOriPackagesByStationId(@RequestParam int currentPage, @RequestParam int pageSize, Long dpid, Long dataType, String traceId, String dataSrc, String dataDst, Long dataSize){
+    public PageInfo<OriPack> getOriPackagesByStationId(@RequestParam int currentPage, @RequestParam int pageSize, Long dpid, Long dataType, String traceId, String dataSrc, String dataDst, Long dataSize){
 
         PageHelper.startPage(currentPage,pageSize);
-        List<Map> result = packService.getAriPackages(dpid, dataType, traceId, dataSrc, dataDst, dataSize);
-        PageInfo<Map> appsPageInfo = new PageInfo<>(result);
+        List<OriPack> result = packService.getAriPackages(dpid, dataType, traceId, dataSrc, dataDst, dataSize);
+        PageInfo<OriPack> appsPageInfo = new PageInfo<>(result);
         return appsPageInfo;
     }
 
@@ -85,11 +80,7 @@ public class ZGCController {
     @GetMapping("/package/getINTPack")
     public INTPack getINTPack(@RequestParam String traceId, @RequestParam long dpid){
         INTPack intPack = packService.getINTPack(traceId, dpid);
-
-        if(!station_start_time.containsKey(intPack.getDpid())) {
-            station_start_time.put(intPack.getDpid(), stationService.getStationById(intPack.getDpid()).getStartTime());
-        }
-        intPack.setTimebias(station_start_time.get(intPack.getDpid()) + intPack.getTimebias());
+        intPack.setTimebias(stationService.getStartTime(intPack.getDpid()) + intPack.getTimebias());
         return intPack;
     }
 
