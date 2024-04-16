@@ -19,7 +19,19 @@ public interface INTPackService {
 
     List<Long> selectPackageRoute(String traceId);
 
-    List<OriPack> getAriPackages(Long dpid, Long dataType, String traceId, String dataSrc, String dataDst, Long dataSize);
+    List<OriPack> getAriPackages(Long dpid, Long dataType, String traceId, String dataSrc, String dataDst, int dataSizeSort, int switchNumSort);
 
     INTPack getINTPack(String traceId, Long dpid);
+
+    List<Long> getAllDataTypes();
+
+    List<String> getAllIPs();
+
+    Map<Long, Long> getOriPackagesNumByStationId(Long dpid);
+
+    Map<Long, Long> getOriPackagesBytesByStationId(Long dpid);
+
+    Map<String, Double> getDurationStatisticByStationId(Long dpid);
+
+    void addINTPackages(List<INTPack> intPacks);
 }

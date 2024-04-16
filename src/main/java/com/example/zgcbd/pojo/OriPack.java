@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @ToString
-public class OriPack {
+public class OriPack{
     private long dataType;
     private String traceId;
     private long dataSize;

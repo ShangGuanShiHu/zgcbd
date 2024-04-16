@@ -16,11 +16,19 @@ public interface INTPackMapper{
 
     List<INTPack> selectALL();
 
-    List<INTPack> selectALLPackages(Long dpid, Long dataType, String traceId, String dataSrc, String dataDst, Long dataSize);
+    List<INTPack> selectALLPackages(Long dpid, Long dataType, String traceId, String dataSrc, String dataDst);
 
     List<INTPack> selectByTraceId(String traceId);
 
-    List<OriPack> selectALLAriPackages(Long dpid, Long dataType, String traceId, String dataSrc, String dataDst, Long dataSize);
+    List<OriPack> selectALLAriPackages(Long dpid, Long dataType, String traceId, String dataSrc, String dataDst);
 
     INTPack getINTPack(String traceId, Long dpid);
+
+    List<Long> getAllDataTypes();
+
+    List<String> getAllSrcIPs();
+
+    List<String> getAllDstIPs();
+
+    void insertPacks(List<INTPack> intPacks);
 }

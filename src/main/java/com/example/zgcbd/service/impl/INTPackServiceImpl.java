@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import com.example.zgcbd.util.Utils;
 
 @Service
 public class INTPackServiceImpl implements INTPackService {
@@ -118,29 +119,39 @@ public class INTPackServiceImpl implements INTPackService {
         return packs.stream().map(INTPack::getDpid).toList();
     }
 
-    public List<OriPack> getAriPackages(Long dpid, Long dataType, String traceId, String dataSrc, String dataDst, Long dataSize){
-        List<OriPack> result = intpackMapper.selectALLAriPackages(dpid, dataType, traceId, dataSrc, dataDst, dataSize);
+    public List<OriPack> getAriPackages(Long dpid, Long dataType, String traceId, String dataSrc, String dataDst, int dataSizeSort, int switchNumSort){
 
         Map<String, OriPackDecorator> map = new HashMap<>();
 
-        for(OriPack oriPack: result){
-            map.put(oriPack.getTraceId(), new OriPackDecorator(oriPack));
-        }
-
-        List<INTPack> packs = intpackMapper.selectALLPackages(null, dataType, traceId, dataSrc, dataDst, dataSize);
+        // 获取所有的数据包，经过的交换机数量无法在数据库中进行排序，但是要自定义分页功能了
+        List<INTPack> packs = intpackMapper.selectALLPackages(null, dataType, traceId, dataSrc, dataDst);
 
         OriPackDecorator oriPackDecorator;
         for(INTPack pack:packs){
             if(!map.containsKey(pack.getTraceId())){
-                continue;
+               map.put(pack.getTraceId(), new OriPackDecorator(new OriPack(pack)));
             }
             oriPackDecorator = map.get(pack.getTraceId());
             oriPackDecorator.addContext(stationService.getStartTime(pack.getDpid())+pack.getTimebias(), pack.getDpid());
         }
 
+        // 收集所有的原始数据包
+        List<OriPack> result = new ArrayList<>();
+
         for(OriPackDecorator oriPackDecorator1:map.values()){
             oriPackDecorator1.updateOriPack();
+            // 根据交换机进行选择
+            if(Objects.isNull(dpid) || oriPackDecorator1.getOriPack().getRoute().contains(dpid)){
+                result.add(oriPackDecorator1.getOriPack());
+            }
         }
+
+
+        // 根据datasize进行排序, 大于0升序，小于0降序，等于0乱序
+        result.sort((OriPack o1, OriPack o2)-> (int)(o1.getDataSize()-o2.getDataSize()) * dataSizeSort);
+
+        // 根据交换机数量进行排序
+        result.sort((OriPack o1, OriPack o2)-> (o1.getRoute().size()-o2.getRoute().size()) * switchNumSort);
 
         return result;
     }
@@ -149,4 +160,68 @@ public class INTPackServiceImpl implements INTPackService {
         return intpackMapper.getINTPack(traceId, dpid);
     }
 
+    public List<Long> getAllDataTypes() {
+        return intpackMapper.getAllDataTypes();
+    }
+
+    public List<String> getAllIPs() {
+        Set<String> ips = new HashSet<>();
+        ips.addAll(intpackMapper.getAllSrcIPs());
+        ips.addAll(intpackMapper.getAllDstIPs());
+        List<String> result = new ArrayList<>(ips.stream().toList());
+        Collections.sort(result);
+        return result;
+    }
+
+    private Map<Long, List<INTPack>> getOriPackageSizeByStationId(Long dpid){
+        Map<Long, List<INTPack>> result = new HashMap<>();
+
+        List<Long> dataTypes = intpackMapper.getAllDataTypes();
+        for(Long dataType: dataTypes){
+            result.put(dataType, new ArrayList<>());
+        }
+
+        for(INTPack pack: intpackMapper.selectByDpid(dpid)){
+            result.get(pack.getDataType()).add(pack);
+        }
+        return result;
+    }
+
+    public Map<Long, Long> getOriPackagesNumByStationId(Long dpid) {
+        Map<Long, List<INTPack>> oriPackageSizeDict = this.getOriPackageSizeByStationId(dpid);
+        Map<Long, Long> result = new HashMap<>();
+        for(Map.Entry<Long, List<INTPack>> entry: oriPackageSizeDict.entrySet()){
+            result.put(entry.getKey(), (long) entry.getValue().size());
+        }
+        return result;
+    }
+
+    public Map<Long, Long> getOriPackagesBytesByStationId(Long dpid){
+        Map<Long, List<INTPack>> oriPackageSizeDict = this.getOriPackageSizeByStationId(dpid);
+        Map<Long, Long> result = new HashMap<>();
+        for(Map.Entry<Long, List<INTPack>> entry: oriPackageSizeDict.entrySet()){
+            result.put(entry.getKey(), entry.getValue().stream().mapToLong(INTPack::getDataSize).sum());
+        }
+        return result;
+    }
+
+    public Map<String, Double> getDurationStatisticByStationId(Long dpid){
+        Map<String, Double> result = new HashMap<>();
+        double[] durations = intpackMapper.selectByDpid(dpid).stream().mapToDouble(INTPack::getDataSize).sorted().toArray();
+
+        // p99
+        result.put("p99", Utils.percentile(durations, 99));
+
+        // p90
+        result.put("p90", Utils.percentile(durations, 90));
+
+        // p50
+        result.put("p50", Utils.percentile(durations, 50));
+
+        return result;
+    }
+
+    public void addINTPackages(List<INTPack> intPacks){
+        intpackMapper.insertPacks(intPacks);
+    }
 }

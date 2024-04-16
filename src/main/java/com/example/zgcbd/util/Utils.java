@@ -19,4 +19,22 @@ public class Utils {
         }
         return null;
     }
+
+    // 计算百分位数的方法
+    public static double percentile(double[] dataset, double percentile) {
+        if (percentile < 0 || percentile > 100) {
+            throw new IllegalArgumentException("百分位数必须在0到100之间");
+        }
+
+        double index = percentile / 100.0 * (dataset.length - 1);
+        if (index == Math.floor(index)) {
+            return dataset[(int) index];
+        } else {
+            int lowerIndex = (int) Math.floor(index);
+            int upperIndex = (int) Math.ceil(index);
+            double lowerValue = dataset[lowerIndex];
+            double upperValue = dataset[upperIndex];
+            return lowerValue + (upperValue - lowerValue) * (index - lowerIndex);
+        }
+    }
 }

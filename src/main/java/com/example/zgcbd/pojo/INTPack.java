@@ -25,7 +25,7 @@ public class INTPack implements Comparable<INTPack>{
   private String dataSrc;
   private String dataDst;
   private long timebias;
-  private String undefined;
+  private long duration;
 
 
   @Override

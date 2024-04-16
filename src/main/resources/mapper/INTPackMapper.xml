@@ -24,9 +24,6 @@
         <if test="dataType != null">
             and data_type = #{dataType}
         </if>
-        <if test="dataSize != null">
-            and data_size = #{dataSize}
-        </if>
         <if test="dataSrc != null">
             and data_src = #{dataSrc}
         </if>
@@ -47,9 +44,6 @@
         <if test="dataType != null">
             and data_type = #{dataType}
         </if>
-        <if test="dataSize != null">
-            and data_size = #{dataSize}
-        </if>
         <if test="dataSrc != null">
             and data_src = #{dataSrc}
         </if>
@@ -60,4 +54,39 @@
     <select id="getINTPack" resultType="com.example.zgcbd.pojo.INTPack">
         select * from intpack where trace_id = #{traceId} and dpid = #{dpid}
     </select>
+
+    <select id="getAllDataTypes" resultType="java.lang.Long">
+        select distinct data_type from intpack
+    </select>
+
+    <select id="getAllSrcIPs" resultType="java.lang.String">
+        select distinct data_src from intpack
+    </select>
+
+    <select id="getAllDstIPs" resultType="java.lang.String">
+        select distinct data_dst from intpack
+    </select>
+
+    <insert id="insertPacks" parameterType="java.util.List">
+        insert into intpack values
+        <foreach collection="list" item="item" separator =",">
+        (
+        #{item.content},
+        #{item.copyFlag},
+        #{item.optclass},
+        #{item.option},
+        #{item.length},
+        #{item.dpid},
+        #{item.dataType},
+        #{item.traceId},
+        #{item.dataSize},
+        #{item.dataSrc},
+        #{item.dataDst},
+        #{item.timebias},
+        #{item.duration}
+        )
+        </foreach>
+
+    </insert>
+
 </mapper>

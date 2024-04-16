@@ -9,14 +9,9 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @RestController
 @MapperScan(value = "com.example.zgcbd.mapper")
@@ -57,11 +52,36 @@ public class ZGCController {
 //    }
 
     @GetMapping("/package/getOriPackages")
-    public PageInfo<OriPack> getOriPackagesByStationId(@RequestParam int currentPage, @RequestParam int pageSize, Long dpid, Long dataType, String traceId, String dataSrc, String dataDst, Long dataSize){
+    public PageInfo<OriPack> getOriPackagesByStationId(@RequestParam int currentPage, @RequestParam int pageSize, Long dpid, Long dataType, String dataSrc, String dataDst, String traceId,@RequestParam int dataSizeSort, @RequestParam int switchNumSort){
+        List<OriPack> result = packService.getAriPackages(dpid, dataType, traceId, dataSrc, dataDst, dataSizeSort,switchNumSort);
+        List<OriPack> resultPage = new ArrayList<>();
 
-        PageHelper.startPage(currentPage,pageSize);
-        List<OriPack> result = packService.getAriPackages(dpid, dataType, traceId, dataSrc, dataDst, dataSize);
-        PageInfo<OriPack> appsPageInfo = new PageInfo<>(result);
+        PageInfo<OriPack> appsPageInfo;
+        // 保证页号大于1，页的大小不超过总数
+        if(currentPage>0 && currentPage*pageSize<=result.size()){
+            for(int i=(currentPage-1)*pageSize;i<currentPage*pageSize;i++){
+                resultPage.add(result.get(i));
+            }
+
+            appsPageInfo = new PageInfo<>(resultPage);
+            appsPageInfo.setPageNum(currentPage);
+            appsPageInfo.setPageSize(pageSize);
+            appsPageInfo.setSize(pageSize);
+            appsPageInfo.setStartRow((currentPage-1)*pageSize);
+            appsPageInfo.setEndRow(currentPage*pageSize-1);
+            appsPageInfo.setPages((result.size()+pageSize-1)/pageSize);
+            appsPageInfo.setPrePage(currentPage-1);
+            appsPageInfo.setNextPage(currentPage+1);
+            appsPageInfo.setIsFirstPage(currentPage==1);
+            appsPageInfo.setIsLastPage(appsPageInfo.getPages() == appsPageInfo.getPageNum());
+            appsPageInfo.setHasPreviousPage(currentPage > 1);
+            appsPageInfo.setHasNextPage(currentPage < appsPageInfo.getPages());
+            appsPageInfo.setTotal(result.size());
+        }
+        else {
+            appsPageInfo = new PageInfo<>(result);
+        }
+
         return appsPageInfo;
     }
 
@@ -83,5 +103,43 @@ public class ZGCController {
         intPack.setTimebias(stationService.getStartTime(intPack.getDpid()) + intPack.getTimebias());
         return intPack;
     }
+
+    @GetMapping("/package/getAllDataType")
+    public List<Long> getAllDataType(){
+        return packService.getAllDataTypes();
+    }
+
+    @GetMapping("/package/getAllIP")
+    public List<String> getAllIP(){
+        return packService.getAllIPs();
+    }
+
+    @GetMapping("/station/getPackageNum")
+    public Map<Long, Long> getOriPackagesNumByStationId(@RequestParam Long dpid){
+        return packService.getOriPackagesNumByStationId(dpid);
+    }
+
+    @GetMapping("/station/getPackageBytes")
+    public Map<Long, Long> getOriPackagesBytesByStationId(@RequestParam Long dpid){
+        return packService.getOriPackagesBytesByStationId(dpid);
+    }
+
+    @GetMapping("/station/getDurationStatistic")
+    public Map<String, Double> getDurationStatisticByStationId(@RequestParam Long dpid){
+        return packService.getDurationStatisticByStationId(dpid);
+    }
+
+    @RequestMapping("/package/addINTPackages")
+    public String addINTPackages(@RequestBody List<INTPack> intPacks){
+        try{
+            packService.addINTPackages(intPacks);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return "Failure";
+        }
+        return "Success";
+    }
+
 
 }
