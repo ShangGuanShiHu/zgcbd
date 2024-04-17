@@ -99,9 +99,7 @@ public class ZGCController {
 
     @GetMapping("/package/getINTPack")
     public INTPack getINTPack(@RequestParam String traceId, @RequestParam long dpid){
-        INTPack intPack = packService.getINTPack(traceId, dpid);
-        intPack.setTimebias(stationService.getStartTime(intPack.getDpid()) + intPack.getTimebias());
-        return intPack;
+        return packService.getINTPack(traceId, dpid);
     }
 
     @GetMapping("/package/getAllDataType")
@@ -141,5 +139,9 @@ public class ZGCController {
         return "Success";
     }
 
+    @GetMapping("/station/updateStartTime")
+    public void updateStartTime(){
+        stationService.updateStationStartTime();
+    }
 
 }

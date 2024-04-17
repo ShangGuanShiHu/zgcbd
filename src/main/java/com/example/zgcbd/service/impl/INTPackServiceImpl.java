@@ -58,17 +58,30 @@ public class INTPackServiceImpl implements INTPackService {
         }
     }
 
+    private void addStartTime(List<INTPack> packs){
+        for(INTPack pack:packs){
+            pack.setTimebias(pack.getTimebias()+stationService.getStartTime(pack.getDpid()));
+        }
+    }
+    private void addStartTime(INTPack pack){
+        pack.setTimebias(pack.getTimebias()+stationService.getStartTime(pack.getDpid()));
+    }
+
 
     public List<INTPack> selectPackagesByDpid(long dpid){
-        return intpackMapper.selectByDpid(dpid);
+        List<INTPack> result = intpackMapper.selectByDpid(dpid);
+        addStartTime(result);
+        return result;
     }
 
     public List<INTPack> selectAllPackages(){
-        return intpackMapper.selectALL();
+        List<INTPack> result = intpackMapper.selectALL();
+        addStartTime(result);
+        return result;
     }
 
     public List<List<Long>> selectStationTopo(){
-        List<INTPack> intPacks = intpackMapper.selectALL();
+        List<INTPack> intPacks = selectAllPackages();
 
         Map<String, List<INTPack>> map = new HashMap<>();
 
@@ -114,7 +127,7 @@ public class INTPackServiceImpl implements INTPackService {
 
     public List<Long> selectPackageRoute(String traceId){
         List<INTPack> packs = intpackMapper.selectByTraceId(traceId);
-        packs.forEach((pack)->{pack.setTimebias(pack.getTimebias()+stationService.getStartTime(pack.getDpid()));});
+        addStartTime(packs);
         Collections.sort(packs);
         return packs.stream().map(INTPack::getDpid).toList();
     }
@@ -126,13 +139,15 @@ public class INTPackServiceImpl implements INTPackService {
         // 获取所有的数据包，经过的交换机数量无法在数据库中进行排序，但是要自定义分页功能了
         List<INTPack> packs = intpackMapper.selectALLPackages(null, dataType, traceId, dataSrc, dataDst);
 
+        addStartTime(packs);
+
         OriPackDecorator oriPackDecorator;
         for(INTPack pack:packs){
             if(!map.containsKey(pack.getTraceId())){
                map.put(pack.getTraceId(), new OriPackDecorator(new OriPack(pack)));
             }
             oriPackDecorator = map.get(pack.getTraceId());
-            oriPackDecorator.addContext(stationService.getStartTime(pack.getDpid())+pack.getTimebias(), pack.getDpid());
+            oriPackDecorator.addContext(pack.getTimebias(), pack.getDpid());
         }
 
         // 收集所有的原始数据包
@@ -157,7 +172,9 @@ public class INTPackServiceImpl implements INTPackService {
     }
 
     public INTPack getINTPack(String traceId, Long dpid){
-        return intpackMapper.getINTPack(traceId, dpid);
+        INTPack result = intpackMapper.getINTPack(traceId, dpid);
+        addStartTime(result);
+        return result;
     }
 
     public List<Long> getAllDataTypes() {
@@ -207,7 +224,7 @@ public class INTPackServiceImpl implements INTPackService {
 
     public Map<String, Double> getDurationStatisticByStationId(Long dpid){
         Map<String, Double> result = new HashMap<>();
-        double[] durations = intpackMapper.selectByDpid(dpid).stream().mapToDouble(INTPack::getDataSize).sorted().toArray();
+        double[] durations = intpackMapper.selectByDpid(dpid).stream().mapToDouble(INTPack::getDuration).sorted().toArray();
 
         // p99
         result.put("p99", Utils.percentile(durations, 99));

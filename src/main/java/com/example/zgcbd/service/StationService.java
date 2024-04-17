@@ -12,4 +12,6 @@ public interface StationService {
     Station getStationById(long dpid);
 
     Long getStartTime(long dpid);
+
+    void updateStationStartTime();
 }

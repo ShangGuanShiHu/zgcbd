@@ -37,4 +37,12 @@ public class StationServiceImpl implements StationService {
         }
         return  station_start_time.get(dpid);
     }
+
+    public void updateStationStartTime(){
+        List<Station> stations = stationMapper.selectALL();
+        station_start_time.clear();
+        for(Station station:stations){
+            station_start_time.put(station.getDpid(), station.getStartTime());
+        }
+    }
 }

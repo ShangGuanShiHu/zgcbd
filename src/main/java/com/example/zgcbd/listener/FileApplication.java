@@ -14,7 +14,7 @@ import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 
-@Component
+//@Component
 public class FileApplication implements ApplicationRunner {
 
     //读取配置文件中了文件路径 拿到要监听的文件夹packFile
