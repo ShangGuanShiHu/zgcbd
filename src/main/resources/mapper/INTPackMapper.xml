@@ -67,26 +67,23 @@
         select distinct data_dst from intpack
     </select>
 
-    <insert id="insertPacks" parameterType="java.util.List">
+    <insert id="insertPack" parameterType="com.example.zgcbd.pojo.INTPack">
         insert into intpack(content,copy_flag,optclass,`option`,`length`,dpid,data_type,trace_id,data_size,data_src,data_dst,timebias,duration) values
-        <foreach collection="list" item="item" separator =",">
         (
-        #{item.content},
-        #{item.copyFlag},
-        #{item.optclass},
-        #{item.option},
-        #{item.length},
-        #{item.dpid},
-        #{item.dataType},
-        #{item.traceId},
-        #{item.dataSize},
-        #{item.dataSrc},
-        #{item.dataDst},
-        #{item.timebias},
-        #{item.duration}
+        #{content},
+        #{copyFlag},
+        #{optclass},
+        #{option},
+        #{length},
+        #{dpid},
+        #{dataType},
+        #{traceId},
+        #{dataSize},
+        #{dataSrc},
+        #{dataDst},
+        #{timebias},
+        #{duration}
         )
-        </foreach>
-
     </insert>
 
 </mapper>

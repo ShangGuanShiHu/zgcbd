@@ -245,6 +245,8 @@ public class INTPackServiceImpl implements INTPackService {
     }
 
     public void addINTPackages(List<INTPack> intPacks){
-        intpackMapper.insertPacks(intPacks);
+        for (INTPack intPack:intPacks){
+            intpackMapper.insertPack(intPack);
+        }
     }
 }

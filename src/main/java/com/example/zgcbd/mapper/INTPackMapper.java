@@ -30,5 +30,5 @@ public interface INTPackMapper{
 
     List<String> getAllDstIPs();
 
-    void insertPacks(List<INTPack> intPacks);
+    void insertPack(INTPack intPack);
 }
