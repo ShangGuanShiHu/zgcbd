@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import java.sql.Timestamp;
 import java.util.List;
 
 
@@ -20,6 +22,8 @@ public class OriPack{
     private List<Long> route = null;
 
     private long transTime = 0;
+
+    private Timestamp firstTime = null;
 
     public OriPack(INTPack intPack){
         this.dataType = intPack.getDataType();
