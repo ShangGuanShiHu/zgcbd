@@ -203,6 +203,9 @@ public class INTPackServiceImpl implements INTPackService {
             }
         }
 
+        // 默认根据first time排序
+        result.sort(Comparator.comparing(OriPack::getFirstTime));
+
 
         // 根据datasize进行排序, 大于0升序，小于0降序，等于0乱序
         result.sort((OriPack o1, OriPack o2)-> (int)(o1.getDataSize()-o2.getDataSize()) * dataSizeSort);
