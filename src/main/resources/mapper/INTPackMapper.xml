@@ -68,7 +68,7 @@
     </select>
 
     <insert id="insertPacks" parameterType="java.util.List">
-        insert into intpack values
+        insert into intpack(content,copy_flag,optclass,`option`,`length`,dpid,data_type,trace_id,data_size,data_src,data_dst,timebias,duration) values
         <foreach collection="list" item="item" separator =",">
         (
         #{item.content},

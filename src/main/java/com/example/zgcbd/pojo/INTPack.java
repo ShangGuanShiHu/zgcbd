@@ -4,8 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import net.sf.jsqlparser.expression.DateTimeLiteralExpression;
 import org.apache.logging.log4j.util.PropertySource;
 
+import java.sql.Timestamp;
 import java.util.Comparator;
 
 @Data
@@ -27,6 +29,7 @@ public class INTPack implements Comparable<INTPack>{
   private long timebias;
   private long duration;
 
+  private Timestamp createTime;
 
   @Override
   public int compareTo(INTPack o) {

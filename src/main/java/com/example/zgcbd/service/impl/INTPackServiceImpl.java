@@ -58,13 +58,19 @@ public class INTPackServiceImpl implements INTPackService {
         }
     }
 
+    private void setTimebias(INTPack pack){
+//        pack.setTimebias(pack.getTimebias()+stationService.getStartTime(pack.getDpid()));
+        pack.setTimebias(pack.getCreateTime().getTime());
+    }
+
     private void addStartTime(List<INTPack> packs){
         for(INTPack pack:packs){
-            pack.setTimebias(pack.getTimebias()+stationService.getStartTime(pack.getDpid()));
+            setTimebias(pack);
         }
     }
     private void addStartTime(INTPack pack){
-        pack.setTimebias(pack.getTimebias()+stationService.getStartTime(pack.getDpid()));
+//        pack.setTimebias(pack.getTimebias()+stationService.getStartTime(pack.getDpid()));
+        setTimebias(pack);
     }
 
 
