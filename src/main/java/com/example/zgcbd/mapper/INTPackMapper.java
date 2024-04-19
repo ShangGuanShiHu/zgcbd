@@ -32,5 +32,7 @@ public interface INTPackMapper{
 
     void insertPack(INTPack intPack);
 
-    int countByDataType(int dataType, int dpid);
+    int countByExample(Integer dataType, Integer dpid);
+
+    int sumSizeByExample(Integer dataType, Integer dpid);
 }

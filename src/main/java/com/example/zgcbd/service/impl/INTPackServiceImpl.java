@@ -147,7 +147,7 @@ public class INTPackServiceImpl implements INTPackService {
         int des;
         // 根据所有的路径解析出网络拓扑
         for (List<Long> dpidsL : topoConfig.getTopo()) {
-            List<String> dpids = dpidsL.stream().map(String::valueOf).toList();
+            List<String> dpids = dpidsL.stream().map(String::valueOf).collect(Collectors.toList());
             src = 0;
             des = 1;
             while (des < dpids.size()){
@@ -230,7 +230,8 @@ public class INTPackServiceImpl implements INTPackService {
         Set<String> ips = new HashSet<>();
         ips.addAll(intpackMapper.getAllSrcIPs());
         ips.addAll(intpackMapper.getAllDstIPs());
-        List<String> result = new ArrayList<>(ips.stream().toList());
+//        List<String> result = new ArrayList<>(ips.stream().toList());
+        List<String> result = new ArrayList<>(ips);
         Collections.sort(result);
         return result;
     }
@@ -291,11 +292,37 @@ public class INTPackServiceImpl implements INTPackService {
 
     public Map<String, Float> getTypeDistribution(int dpid){
         Map<String, Float> result = new HashMap<>();
-        int UDPNum = intpackMapper.countByDataType(17, dpid);
-        int TCPNum = intpackMapper.countByDataType(6, dpid);
+        int UDPNum = intpackMapper.countByExample(17, dpid);
+        int TCPNum = intpackMapper.countByExample(6, dpid);
         int total = UDPNum + TCPNum;
         result.put("UDP", (float) UDPNum/total);
         result.put("TCP", (float) TCPNum/total);
+        return result;
+    }
+
+    public Map<String, Float> getStationStatistic(int dpid) {
+        Map<String, Float> result = new HashMap<>();
+        // 流经交换机的监控数据包总数量
+        int dpDataNum = intpackMapper.countByExample(null, dpid);
+        // 所有监控数据包总数
+        int totalNum = intpackMapper.countByExample(null, null);
+        // 流经交换机的UDP总数
+        int dpUDPNum = intpackMapper.countByExample(17, dpid);
+        // 流经交换机的TCP总数
+        int dpTCPNum = intpackMapper.countByExample(6, dpid);
+        // 数据大小占比
+        int totalSize = intpackMapper.sumSizeByExample(null, null);
+        int dpSize = intpackMapper.sumSizeByExample(null, dpid);
+
+        float numP = (float) dpDataNum / totalNum;
+        float udpNumP = (float) dpUDPNum / totalNum;
+        float tcpNumP = (float) dpTCPNum / totalNum;
+        float sizeP = (float) dpSize / totalSize;
+
+        result.put("numP", numP);
+        result.put("udpNumP", udpNumP);
+        result.put("tcpNumP", tcpNumP);
+        result.put("sizeP", sizeP);
         return result;
     }
 }

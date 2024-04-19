@@ -90,6 +90,11 @@ public class ZGCController {
         return packService.getTypeDistribution(dpid);
     }
 
+    @GetMapping("/station/statistic")
+    public Map<String, Float> getStationStatistic(@RequestParam int dpid) {
+        return packService.getStationStatistic(dpid);
+    }
+
 
     @GetMapping("/station/getStationTopo")
     public List<List<Long>> getStationTopo() {
