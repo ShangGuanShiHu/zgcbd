@@ -6,11 +6,12 @@ import com.example.zgcbd.pojo.INTPack;
 import com.example.zgcbd.pojo.OriPack;
 import com.example.zgcbd.service.INTPackService;
 import com.example.zgcbd.service.StationService;
+import com.example.zgcbd.util.TimeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import java.util.Calendar;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -52,7 +53,9 @@ public class INTPackServiceImpl implements INTPackService {
             oriPack.setRoute(topoConfig.getRoute(oriPack));
             long transTime= contexts.get(contexts.size() - 1).getTime() - contexts.get(0).getTime();
             oriPack.setTransTime(transTime);
-            oriPack.setFirstTime(new Timestamp(contexts.get(0).getTime()));
+            Timestamp firstTime = new Timestamp(contexts.get(0).getTime());
+            firstTime = TimeUtil.transTimeToLocal(firstTime);
+            oriPack.setFirstTime(firstTime);
             return oriPack;
         }
 
