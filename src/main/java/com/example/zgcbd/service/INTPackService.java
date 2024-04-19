@@ -35,7 +35,7 @@ public interface INTPackService {
 
     void addINTPackages(List<INTPack> intPacks);
 
-    Map<String, Float> getTypeDistribution(int dpid);
+    Map<String, Float> getTypeDistribution(Integer dpid);
 
-    Map<String, Float> getStationStatistic(int dpid);
+    Map<String, Float> getStationStatistic(Integer dpid);
 }

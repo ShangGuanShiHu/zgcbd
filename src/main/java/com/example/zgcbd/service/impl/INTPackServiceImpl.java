@@ -293,7 +293,7 @@ public class INTPackServiceImpl implements INTPackService {
         }
     }
 
-    public Map<String, Float> getTypeDistribution(int dpid){
+    public Map<String, Float> getTypeDistribution(Integer dpid){
         Map<String, Float> result = new HashMap<>();
         int UDPNum = intpackMapper.countByParams(17, dpid);
         int TCPNum = intpackMapper.countByParams(6, dpid);
@@ -303,7 +303,7 @@ public class INTPackServiceImpl implements INTPackService {
         return result;
     }
 
-    public Map<String, Float> getStationStatistic(int dpid) {
+    public Map<String, Float> getStationStatistic(Integer dpid) {
         Map<String, Float> result = new HashMap<>();
         // 流经交换机的监控数据包总数量
         int dpDataNum = intpackMapper.countByParams(null, dpid);
