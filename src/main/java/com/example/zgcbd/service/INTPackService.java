@@ -34,4 +34,8 @@ public interface INTPackService {
     Map<String, Double> getDurationStatisticByStationId(Long dpid);
 
     void addINTPackages(List<INTPack> intPacks);
+
+    Map<String, Float> getTypeDistribution(Integer dpid);
+
+    Map<String, Float> getStationStatistic(Integer dpid);
 }

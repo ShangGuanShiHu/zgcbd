@@ -85,5 +85,26 @@
         #{duration}
         )
     </insert>
+    
+    <select id="countByParams"  resultType="java.lang.Integer">
+        select count(*) from intpack
+        where 0=0
+        <if test="dataType != null">
+            and data_type = #{dataType}
+        </if>
+        <if test="dpid != null">
+            and dpid = #{dpid}
+        </if>
+    </select>
+    <select id="sumSizeByParams"  resultType="java.lang.Integer">
+        select SUM(data_size) from intpack
+        where 0=0
+        <if test="dataType != null">
+            and data_type = #{dataType}
+        </if>
+        <if test="dpid != null">
+            and dpid = #{dpid}
+        </if>
+    </select>
 
 </mapper>

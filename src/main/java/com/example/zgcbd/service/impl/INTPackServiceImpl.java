@@ -6,11 +6,12 @@ import com.example.zgcbd.pojo.INTPack;
 import com.example.zgcbd.pojo.OriPack;
 import com.example.zgcbd.service.INTPackService;
 import com.example.zgcbd.service.StationService;
+import com.example.zgcbd.util.TimeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import java.util.Calendar;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -52,7 +53,9 @@ public class INTPackServiceImpl implements INTPackService {
             oriPack.setRoute(topoConfig.getRoute(oriPack));
             long transTime= contexts.get(contexts.size() - 1).getTime() - contexts.get(0).getTime();
             oriPack.setTransTime(transTime);
-            oriPack.setFirstTime(new Timestamp(contexts.get(0).getTime()));
+            Timestamp firstTime = new Timestamp(contexts.get(0).getTime());
+            firstTime = TimeUtil.transTimeToLocal(firstTime);
+            oriPack.setFirstTime(firstTime);
             return oriPack;
         }
 
@@ -147,7 +150,7 @@ public class INTPackServiceImpl implements INTPackService {
         int des;
         // 根据所有的路径解析出网络拓扑
         for (List<Long> dpidsL : topoConfig.getTopo()) {
-            List<String> dpids = dpidsL.stream().map(String::valueOf).toList();
+            List<String> dpids = dpidsL.stream().map(String::valueOf).collect(Collectors.toList());
             src = 0;
             des = 1;
             while (des < dpids.size()){
@@ -203,8 +206,8 @@ public class INTPackServiceImpl implements INTPackService {
             }
         }
 
-        // 默认根据first time排序
-        result.sort(Comparator.comparing(OriPack::getFirstTime));
+        // 默认根据first time降序排序
+        result.sort(Comparator.comparing(OriPack::getFirstTime).reversed());
 
 
         // 根据datasize进行排序, 大于0升序，小于0降序，等于0乱序
@@ -230,7 +233,8 @@ public class INTPackServiceImpl implements INTPackService {
         Set<String> ips = new HashSet<>();
         ips.addAll(intpackMapper.getAllSrcIPs());
         ips.addAll(intpackMapper.getAllDstIPs());
-        List<String> result = new ArrayList<>(ips.stream().toList());
+//        List<String> result = new ArrayList<>(ips.stream().toList());
+        List<String> result = new ArrayList<>(ips);
         Collections.sort(result);
         return result;
     }
@@ -287,5 +291,41 @@ public class INTPackServiceImpl implements INTPackService {
         for (INTPack intPack:intPacks){
             intpackMapper.insertPack(intPack);
         }
+    }
+
+    public Map<String, Float> getTypeDistribution(Integer dpid){
+        Map<String, Float> result = new HashMap<>();
+        int UDPNum = intpackMapper.countByParams(17, dpid);
+        int TCPNum = intpackMapper.countByParams(6, dpid);
+        int total = UDPNum + TCPNum;
+        result.put("UDP", (float) UDPNum/total);
+        result.put("TCP", (float) TCPNum/total);
+        return result;
+    }
+
+    public Map<String, Float> getStationStatistic(Integer dpid) {
+        Map<String, Float> result = new HashMap<>();
+        // 流经交换机的监控数据包总数量
+        int dpDataNum = intpackMapper.countByParams(null, dpid);
+        // 所有监控数据包总数
+        int totalNum = intpackMapper.countByParams(null, null);
+        // 流经交换机的UDP总数
+        int dpUDPNum = intpackMapper.countByParams(17, dpid);
+        // 流经交换机的TCP总数
+        int dpTCPNum = intpackMapper.countByParams(6, dpid);
+        // 数据大小占比
+        int totalSize = intpackMapper.sumSizeByParams(null, null);
+        int dpSize = intpackMapper.sumSizeByParams(null, dpid);
+
+        float numP = (float) dpDataNum / totalNum;
+        float udpNumP = (float) dpUDPNum / totalNum;
+        float tcpNumP = (float) dpTCPNum / totalNum;
+        float sizeP = (float) dpSize / totalSize;
+
+        result.put("numP", numP);
+        result.put("udpNumP", udpNumP);
+        result.put("tcpNumP", tcpNumP);
+        result.put("sizeP", sizeP);
+        return result;
     }
 }
