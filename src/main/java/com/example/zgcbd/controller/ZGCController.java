@@ -56,23 +56,23 @@ public class ZGCController {
         List<OriPack> result = packService.getAriPackages(dpid, dataType, traceId, dataSrc, dataDst, dataSizeSort,switchNumSort);
         List<OriPack> resultPage = new ArrayList<>();
 
+        int maxPageNum = (result.size()+pageSize-1) / pageSize;
         PageInfo<OriPack> appsPageInfo;
         // 保证页号大于1，页的大小不超过总数
-        if(currentPage>0 && currentPage*pageSize<=result.size()){
-            for(int i=(currentPage-1)*pageSize;i<currentPage*pageSize;i++){
+        if(currentPage>0 && currentPage<=maxPageNum) {
+            for (int i = (currentPage - 1) * pageSize; i < result.size() && i < currentPage * pageSize; i++) {
                 resultPage.add(result.get(i));
             }
-
             appsPageInfo = new PageInfo<>(resultPage);
             appsPageInfo.setPageNum(currentPage);
             appsPageInfo.setPageSize(pageSize);
             appsPageInfo.setSize(pageSize);
-            appsPageInfo.setStartRow((currentPage-1)*pageSize);
-            appsPageInfo.setEndRow(currentPage*pageSize-1);
-            appsPageInfo.setPages((result.size()+pageSize-1)/pageSize);
-            appsPageInfo.setPrePage(currentPage-1);
-            appsPageInfo.setNextPage(currentPage+1);
-            appsPageInfo.setIsFirstPage(currentPage==1);
+            appsPageInfo.setStartRow((currentPage - 1) * pageSize);
+            appsPageInfo.setEndRow(currentPage * pageSize - 1);
+            appsPageInfo.setPages((result.size() + pageSize - 1) / pageSize);
+            appsPageInfo.setPrePage(currentPage - 1);
+            appsPageInfo.setNextPage(currentPage + 1);
+            appsPageInfo.setIsFirstPage(currentPage == 1);
             appsPageInfo.setIsLastPage(appsPageInfo.getPages() == appsPageInfo.getPageNum());
             appsPageInfo.setHasPreviousPage(currentPage > 1);
             appsPageInfo.setHasNextPage(currentPage < appsPageInfo.getPages());
@@ -81,7 +81,6 @@ public class ZGCController {
         else {
             appsPageInfo = new PageInfo<>(result);
         }
-
         return appsPageInfo;
     }
 
