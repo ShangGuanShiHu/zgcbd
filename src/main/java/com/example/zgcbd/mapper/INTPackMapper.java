@@ -31,4 +31,6 @@ public interface INTPackMapper{
     List<String> getAllDstIPs();
 
     void insertPack(INTPack intPack);
+
+    int countByDataType(int dataType, int dpid);
 }

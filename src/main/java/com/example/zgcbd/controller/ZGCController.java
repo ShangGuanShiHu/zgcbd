@@ -85,6 +85,11 @@ public class ZGCController {
         return appsPageInfo;
     }
 
+    @GetMapping("/package/distribution")
+    public Map<String, Float> getTypeDistribution(@RequestParam int dpid) {
+        return packService.getTypeDistribution(dpid);
+    }
+
 
     @GetMapping("/station/getStationTopo")
     public List<List<Long>> getStationTopo() {

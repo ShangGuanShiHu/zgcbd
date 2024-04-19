@@ -203,8 +203,8 @@ public class INTPackServiceImpl implements INTPackService {
             }
         }
 
-        // 默认根据first time排序
-        result.sort(Comparator.comparing(OriPack::getFirstTime));
+        // 默认根据first time降序排序
+        result.sort(Comparator.comparing(OriPack::getFirstTime).reversed());
 
 
         // 根据datasize进行排序, 大于0升序，小于0降序，等于0乱序
@@ -287,5 +287,15 @@ public class INTPackServiceImpl implements INTPackService {
         for (INTPack intPack:intPacks){
             intpackMapper.insertPack(intPack);
         }
+    }
+
+    public Map<String, Float> getTypeDistribution(int dpid){
+        Map<String, Float> result = new HashMap<>();
+        int UDPNum = intpackMapper.countByDataType(17, dpid);
+        int TCPNum = intpackMapper.countByDataType(6, dpid);
+        int total = UDPNum + TCPNum;
+        result.put("UDP", (float) UDPNum/total);
+        result.put("TCP", (float) TCPNum/total);
+        return result;
     }
 }

@@ -85,5 +85,10 @@
         #{duration}
         )
     </insert>
+    
+    <select id="countByDataType"  resultType="java.lang.Integer">
+        select count(*) from intpack
+        where data_type = #{dataType} and dpid = #{dpid}
+    </select>
 
 </mapper>
