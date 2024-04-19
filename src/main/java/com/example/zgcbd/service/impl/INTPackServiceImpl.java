@@ -54,7 +54,7 @@ public class INTPackServiceImpl implements INTPackService {
             long transTime= contexts.get(contexts.size() - 1).getTime() - contexts.get(0).getTime();
             oriPack.setTransTime(transTime);
             Timestamp firstTime = new Timestamp(contexts.get(0).getTime());
-            firstTime = TimeUtil.transTimeToLocal(firstTime);
+//            firstTime = TimeUtil.transTimeToLocal(firstTime);
             oriPack.setFirstTime(firstTime);
             return oriPack;
         }
