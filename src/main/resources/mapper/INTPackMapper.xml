@@ -86,20 +86,20 @@
         )
     </insert>
     
-    <select id="countByExample"  resultType="java.lang.Integer">
+    <select id="countByParams"  resultType="java.lang.Integer">
         select count(*) from intpack
         where 0=0
-        <if test="data_type != null">
+        <if test="dataType != null">
             and data_type = #{dataType}
         </if>
         <if test="dpid != null">
             and dpid = #{dpid}
         </if>
     </select>
-    <select id="sumSizeByExample"  resultType="java.lang.Integer">
+    <select id="sumSizeByParams"  resultType="java.lang.Integer">
         select SUM(data_size) from intpack
         where 0=0
-        <if test="data_type != null">
+        <if test="dataType != null">
             and data_type = #{dataType}
         </if>
         <if test="dpid != null">
